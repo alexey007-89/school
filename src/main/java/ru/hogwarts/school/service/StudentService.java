@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,8 @@ public class StudentService {
             return ResponseEntity.notFound().build();
         }
         student.setId(++studentIdCounter);
-        Student putStudent = students.put(student.getId(), student);
-        return ResponseEntity.ok(putStudent);
+        students.put(student.getId(), student);
+        return ResponseEntity.ok(student);
     }
 
     public ResponseEntity<Student> getStudentById(Long id) {
@@ -58,6 +59,14 @@ public class StudentService {
         List<Student> studentList = students.values().stream()
                 .filter(student -> student.getAge() == age)
                 .collect(Collectors.toList());
+        if (studentList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(studentList);
+    }
+
+    public ResponseEntity<Collection<Student>> getAll() {
+        Collection<Student> studentList = students.values();
         if (studentList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

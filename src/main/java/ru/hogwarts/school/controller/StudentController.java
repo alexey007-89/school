@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -24,6 +25,11 @@ public class StudentController {
     @GetMapping("{id}")
     public ResponseEntity<Student> getStudent(@PathVariable Long id) {
         return studentService.getStudentById(id);
+    }
+
+    @GetMapping
+    public ResponseEntity<Collection<Student>> getAll() {
+        return studentService.getAll();
     }
 
     @PutMapping

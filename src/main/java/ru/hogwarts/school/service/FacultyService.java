@@ -3,7 +3,9 @@ package ru.hogwarts.school.service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +25,8 @@ public class FacultyService {
             return ResponseEntity.notFound().build();
         }
         faculty.setId(++facultyIdCounter);
-        Faculty putFaculty = faculties.put(faculty.getId(), faculty);
-        return ResponseEntity.ok(putFaculty);
+        faculties.put(faculty.getId(), faculty);
+        return ResponseEntity.ok(faculty);
     }
 
     public ResponseEntity<Faculty> getFacultyById(Long id) {
@@ -58,6 +60,14 @@ public class FacultyService {
         List<Faculty> facultyList = faculties.values().stream()
                 .filter(faculty -> faculty.getColor().equals(color))
                 .collect(Collectors.toList());
+        if (facultyList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(facultyList);
+    }
+
+    public ResponseEntity<Collection<Faculty>> getAll() {
+        Collection<Faculty> facultyList = faculties.values();
         if (facultyList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
