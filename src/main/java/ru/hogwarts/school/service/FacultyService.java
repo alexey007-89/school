@@ -3,63 +3,53 @@ package ru.hogwarts.school.service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class FacultyService {
-    private final Map<Long, Faculty> faculties;
-    private Long facultyIdCounter = 0L;
 
-    FacultyService() {
-        this.faculties = new HashMap<>();
+    private final FacultyRepository facultyRepository;
+
+    public FacultyService(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
     }
 
     public ResponseEntity<Faculty> createFaculty(Faculty faculty) {
         if (faculty == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
-        faculty.setId(++facultyIdCounter);
-        faculties.put(faculty.getId(), faculty);
-        return ResponseEntity.ok(faculty);
+        return ResponseEntity.ok(facultyRepository.save(faculty));
     }
 
     public ResponseEntity<Faculty> getFacultyById(Long id) {
-        Faculty faculty = faculties.get(id);
-        if (faculty == null) {
+        Optional<Faculty> byId = facultyRepository.findById(id);
+        if (byId.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(faculty);
+        return ResponseEntity.ok(byId.get());
     }
 
-    public ResponseEntity<Faculty> updateFaculty(Long id, Faculty faculty) {
-        if (!faculties.containsKey(id)) {
+    public ResponseEntity<Faculty> updateFaculty(Faculty faculty) {
+        if (faculty == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (facultyRepository.findById(faculty.getId()).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        Faculty putFaculty = faculties.put(id, faculty);
-        if (putFaculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(putFaculty);
+        return ResponseEntity.ok(facultyRepository.save(faculty));
     }
 
     public ResponseEntity<Faculty> removeFaculty(Long id) {
-        Faculty faculty = faculties.remove(id);
-        if (faculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(faculty);
+        facultyRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<List<Faculty>> getFacultyByColor(String color) {
-        List<Faculty> facultyList = faculties.values().stream()
-                .filter(faculty -> faculty.getColor().equals(color))
-                .collect(Collectors.toList());
+    public ResponseEntity<List<Faculty>> getFacultiesByColor(String color) {
+        List<Faculty> facultyList = facultyRepository.findByColor(color);
         if (facultyList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -67,7 +57,7 @@ public class FacultyService {
     }
 
     public ResponseEntity<Collection<Faculty>> getAll() {
-        Collection<Faculty> facultyList = faculties.values();
+        Collection<Faculty> facultyList = facultyRepository.findAll();
         if (facultyList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
