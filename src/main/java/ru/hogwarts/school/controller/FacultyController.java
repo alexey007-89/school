@@ -35,15 +35,16 @@ public class FacultyController {
 
     @PutMapping
     public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
-        return facultyService.updateFaculty(faculty.getId(), faculty);
+        return facultyService.updateFaculty(faculty);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
         return facultyService.removeFaculty(id);
     }
+
     @GetMapping("filter/{color}")
     public ResponseEntity<List<Faculty>> getFaculties(@PathVariable String color) {
-        return facultyService.getFacultyByColor(color);
+        return facultyService.getFacultiesByColor(color);
     }
 }

@@ -34,7 +34,7 @@ public class StudentController {
 
     @PutMapping
     public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
-        return studentService.updateStudent(student.getId(), student);
+        return studentService.updateStudent(student);
     }
 
     @DeleteMapping("{id}")
