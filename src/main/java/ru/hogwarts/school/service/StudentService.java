@@ -63,4 +63,12 @@ public class StudentService {
         }
         return ResponseEntity.ok(studentList);
     }
+
+    public ResponseEntity<List<Student>> findByAgeBetween(int minAge, int maxAge) {
+        List<Student> studentList = studentRepository.findByAgeBetween(minAge, maxAge);
+        if (studentList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(studentList);
+    }
 }
