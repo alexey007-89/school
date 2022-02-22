@@ -49,9 +49,7 @@ public class FacultyController {
     }
 
     @GetMapping("filter")
-    public ResponseEntity<List<Faculty>>
-    getFacultiesByNameOrColor(@RequestParam String str) {
-        return facultyService
-                .findByNameContainingIgnoreCaseOrColorContainingIgnoreCase(str);
+    public ResponseEntity<List<Faculty>> getFacultiesByNameOrColor(@RequestParam String str) {
+        return facultyService.findByNameContainingIgnoreCaseOrColorContainingIgnoreCase(str);
     }
 }
