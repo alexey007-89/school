@@ -71,4 +71,21 @@ public class StudentService {
         }
         return ResponseEntity.ok(studentList);
     }
+
+    public ResponseEntity<Long> getAmountOfAllStudents() {
+        return ResponseEntity.ok(studentRepository.getAmountOfAllStudents());
+    }
+
+    public ResponseEntity<Double> getAverageAgeOfAllStudents() {
+        return ResponseEntity.ok(studentRepository.getAverageAgeOfAllStudents());
+    }
+
+    public ResponseEntity<Collection<Student>> getLastFiveStudents() {
+        Long amount = studentRepository.getAmountOfAllStudents();
+        Collection<Student> studentList = studentRepository.getLastFiveStudents(amount);
+        if (studentList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(studentList);
+    }
 }
