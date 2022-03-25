@@ -8,6 +8,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,5 +95,20 @@ public class FacultyService {
         }
         logger.debug("List of faculties with name or color containing {} wit ignoring case: {}", str, facultyList);
         return ResponseEntity.ok(facultyList);
+    }
+
+    public ResponseEntity<String> getFacultyNameWithMaxLength() {
+        logger.info("Was invoked method to find faculty name with max length");
+        Collection<Faculty> facultyList = facultyRepository.findAll();
+        Optional<String> maxFacultyName = facultyList.stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparing(String::length));
+        if (maxFacultyName.isEmpty()) {
+            logger.error("There is no faculties at all");
+            return ResponseEntity.notFound().build();
+        } else {
+            logger.debug("Faculty name with max length: {}", maxFacultyName.get());
+            return ResponseEntity.ok(maxFacultyName.get());
+        }
     }
 }
