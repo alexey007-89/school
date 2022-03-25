@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ public class AvatarService {
 
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
+    Logger logger = LoggerFactory.getLogger(AvatarService.class);
 
     public AvatarService(AvatarRepository avatarRepository, StudentRepository studentRepository) {
         this.avatarRepository = avatarRepository;
@@ -37,6 +40,7 @@ public class AvatarService {
     }
 
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
+        logger.info("Was invoked method to upload avatar for student to file");
         Student student = studentRepository.getById(studentId);
         Path filePath = Path.of(avatarsDir, student + "." + getExtensions(avatarFile.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
@@ -56,9 +60,11 @@ public class AvatarService {
         avatar.setMediaType(avatarFile.getContentType());
         avatar.setData(generateDataForDB(filePath));
         avatarRepository.save(avatar);
+        logger.debug("Avatar file was uploaded to file for {}",student);
     }
 
     private byte[] generateDataForDB(Path filePath) throws IOException {
+        logger.info("Was invoked method to upload avatar for student to DB");
         try (
                 InputStream is = Files.newInputStream(filePath);
                 BufferedInputStream bis = new BufferedInputStream(is,1024);
@@ -77,20 +83,25 @@ public class AvatarService {
     }
 
     public Avatar findAvatar(Long studentId) {
+        logger.info("Was invoked method to find avatar for student by id={}", studentId);
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
 
     private String getExtensions(String fileName) {
+        logger.info("Was invoked method to get extension of the avatar file");
         return fileName.substring(fileName.lastIndexOf(".") + 1);
 
     }
 
     public ResponseEntity<Collection<Avatar>> getAll(Integer pageNumber, Integer pageSize) {
+        logger.info("Was invoked method to get all of avatars");
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         Collection<Avatar> avatarsList = avatarRepository.findAll(pageRequest).getContent();
         if (avatarsList.isEmpty()) {
+            logger.error("There is no avatars at all");
             return ResponseEntity.notFound().build();
         }
+        logger.debug(" Pageable list of all avatars (page number= {}, page size={}): {}", avatarsList, pageNumber, pageSize);
         return ResponseEntity.ok(avatarsList);
     }
 }
