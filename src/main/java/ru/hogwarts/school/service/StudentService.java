@@ -123,13 +123,13 @@ public class StudentService {
 
     public ResponseEntity<Collection<String>> getStudentsNamesStartingWith(String str) {
         logger.info("Was invoked method to students names starting with input string");
-        Collection<Student> studentList = studentRepository.findAll();
-        String upper = str.toUpperCase(Locale.ROOT);
-        List<String> nameList = studentList.stream()
-                .map(student -> student.getName().toUpperCase(Locale.ROOT))
-                .filter(s -> s.startsWith(upper)).collect(Collectors.toList());
+        Collection<String> nameList = studentRepository.findAll().stream()
+                .map(Student::getName)
+                .map(String::toUpperCase)
+                .filter(s -> s.startsWith(str.toUpperCase()))
+                .sorted().collect(Collectors.toList());
         if (nameList.isEmpty()) {
-            logger.error("The list of names is empty");
+            logger.error("The list of students is empty");
             return ResponseEntity.notFound().build();
         }
         logger.debug("List of students names starting with {}: {}", str, nameList);
@@ -138,14 +138,12 @@ public class StudentService {
 
     public ResponseEntity<Double> getAverageAgeOfAllStudentsUsingStream() {
         logger.info("Was invoked method to get average age off all students using Stream API");
-        Collection<Student> studentList = studentRepository.findAll();
-        OptionalDouble averageAgeOfAllStudents = studentList.stream().mapToInt(Student::getAge).average();
-        if (averageAgeOfAllStudents.isEmpty()) {
-            logger.error("The list of students is empty");
-            return ResponseEntity.notFound().build();
-        } else {
-            logger.debug("The average age off all students is {}", averageAgeOfAllStudents.getAsDouble());
-            return ResponseEntity.ok(averageAgeOfAllStudents.getAsDouble());
-        }
+        return studentRepository.findAll().stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .stream()
+                .mapToObj(ResponseEntity::ok)
+                .findFirst()
+                .orElse( ResponseEntity.notFound().build());
     }
 }
