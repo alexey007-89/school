@@ -7,9 +7,8 @@ import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -120,5 +119,31 @@ public class StudentService {
         }
         logger.debug("List of last 5 added students: {}", studentList);
         return ResponseEntity.ok(studentList);
+    }
+
+    public ResponseEntity<Collection<String>> getStudentsNamesStartingWith(String str) {
+        logger.info("Was invoked method to students names starting with input string");
+        Collection<String> nameList = studentRepository.findAll().stream()
+                .map(Student::getName)
+                .map(String::toUpperCase)
+                .filter(s -> s.startsWith(str.toUpperCase()))
+                .sorted().collect(Collectors.toList());
+        if (nameList.isEmpty()) {
+            logger.error("The list of students is empty");
+            return ResponseEntity.notFound().build();
+        }
+        logger.debug("List of students names starting with {}: {}", str, nameList);
+        return ResponseEntity.ok(nameList);
+    }
+
+    public ResponseEntity<Double> getAverageAgeOfAllStudentsUsingStream() {
+        logger.info("Was invoked method to get average age off all students using Stream API");
+        return studentRepository.findAll().stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .stream()
+                .mapToObj(ResponseEntity::ok)
+                .findFirst()
+                .orElse( ResponseEntity.notFound().build());
     }
 }

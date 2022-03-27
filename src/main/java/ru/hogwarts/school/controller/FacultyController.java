@@ -3,7 +3,6 @@ package ru.hogwarts.school.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
@@ -51,5 +50,10 @@ public class FacultyController {
     @GetMapping("filter")
     public ResponseEntity<List<Faculty>> getFacultiesByNameOrColor(@RequestParam String str) {
         return facultyService.findByNameContainingIgnoreCaseOrColorContainingIgnoreCase(str);
+    }
+
+    @GetMapping("max-name")
+    public ResponseEntity<String> getFacultyNameWithMaxLength() {
+        return facultyService.getFacultyNameWithMaxLength();
     }
 }
