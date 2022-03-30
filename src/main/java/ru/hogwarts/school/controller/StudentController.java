@@ -77,4 +77,14 @@ public class StudentController {
     public ResponseEntity<Double> getAverageAgeOfAllStudentsUsingStream() {
         return studentService.getAverageAgeOfAllStudentsUsingStream();
     }
+
+    @GetMapping("name-list-by-thread")
+    public ResponseEntity<Collection<String>> getNameListByThread() {
+        return studentService.getNameListByThread();
+    }
+
+    @GetMapping("name-list-by-sync-thread")
+    public ResponseEntity<Collection<String>> getNameListBySyncThread() {
+        return studentService.getNameListBySyncThread();
+    }
 }
